@@ -12,9 +12,9 @@
   "require": {
     "neomerx/json-api": "v1.0.1",
     "alexlcdee/colorcli": "dev-master",
-    "symfony/routing": "3.2.x-dev",
     "monolog/monolog": "2.0.x-dev",
-    "php-di/php-di": "6.0.x-dev"
+    "php-di/php-di": "6.0.x-dev",
+    "aura/router": "^3.1"
   },
   "autoload": {
     "psr-4": {
