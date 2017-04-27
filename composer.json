@@ -1,0 +1,24 @@
+{
+  "name": "alexlcdee/microcore",
+  "description": "Core for microservice applications",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "AlexLcDee",
+      "email": "info@alexlcdee.ru"
+    }
+  ],
+  "require": {
+    "neomerx/json-api": "v1.0.1",
+    "alexlcdee/colorcli": "dev-master",
+    "symfony/routing": "3.2.x-dev",
+    "monolog/monolog": "2.0.x-dev",
+    "php-di/php-di": "6.0.x-dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "MicroCore\\": "src/"
+    }
+  }
+}
