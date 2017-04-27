@@ -1,1 +1,1 @@
-web: php develop/app.php
+web: php develop/app.php web/
