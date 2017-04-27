@@ -14,7 +14,8 @@
     "alexlcdee/colorcli": "dev-master",
     "monolog/monolog": "2.0.x-dev",
     "php-di/php-di": "6.0.x-dev",
-    "aura/router": "^3.1"
+    "aura/router": "^3.1",
+    "guzzlehttp/psr7": "^1.4"
   },
   "autoload": {
     "psr-4": {

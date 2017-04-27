@@ -28,6 +28,7 @@ $builder->addDefinitions([
             $response->getBody()->write('Test');
             return $response;
         });
+        return $container;
     })()
 ]);
 
