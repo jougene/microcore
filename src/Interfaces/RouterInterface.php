@@ -6,12 +6,12 @@
  * Time: 13:26
  */
 
-namespace MicroCore;
+namespace MicroCore\Interfaces;
 
 
 use Psr\Http\Message\ServerRequestInterface;
 
 interface RouterInterface
 {
-    public function match(ServerRequestInterface $request);
+    public function match(ServerRequestInterface $request): ?RouteInterface;
 }

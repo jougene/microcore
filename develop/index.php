@@ -1,7 +1,7 @@
 <?php
 
 use DI\ContainerBuilder;
-use MicroCore\App;
+use MicroCore\Components\App;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 

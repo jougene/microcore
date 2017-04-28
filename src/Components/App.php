@@ -6,12 +6,14 @@
  * Time: 14:32
  */
 
-namespace MicroCore;
+namespace MicroCore\Components;
 
 
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Uri;
+use MicroCore\Interfaces\RouteInterface;
+use MicroCore\Interfaces\RouterInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -35,7 +37,7 @@ class App
         /** @var RouterInterface $router */
         $router = $this->container->get(RouterInterface::class);
         $route = $router->match($request);
-        if ($route !== false) {
+        if ($route !== null) {
             $response = $this->processRoute($request, $route);
         } else {
             $response = new Response(404, [], 'Endpoint not found');
@@ -43,10 +45,10 @@ class App
         $this->write($response);
     }
 
-    public function processRoute($request, $route)
+    public function processRoute($request, RouteInterface $route)
     {
         /** @var Response $response */
-        $response = call_user_func_array([new $route->handler[0], $route->handler[1]], [$request, new Response()]);
+        $response = call_user_func_array([$route->getHandler(), 'run'], [$request, new Response()]);
         return $response;
     }
 

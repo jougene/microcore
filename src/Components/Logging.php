@@ -6,7 +6,7 @@
  * Time: 23:12
  */
 
-namespace MicroCore;
+namespace MicroCore\Components;
 
 
 use Psr\Log\AbstractLogger;
@@ -15,6 +15,11 @@ use Psr\Log\LoggerInterface;
 class Logging extends AbstractLogger
 {
     /**
+     * @var LoggerInterface[]
+     */
+    protected $loggers = [];
+
+    /**
      * Logging constructor.
      * @param LoggerInterface[] $loggers
      */
@@ -22,11 +27,6 @@ class Logging extends AbstractLogger
     {
         $this->loggers = $loggers;
     }
-
-    /**
-     * @var LoggerInterface[]
-     */
-    protected $loggers = [];
 
     /**
      * Logs with an arbitrary level.

@@ -15,7 +15,8 @@
     "monolog/monolog": "2.0.x-dev",
     "php-di/php-di": "~5",
     "aura/router": "^3.1",
-    "guzzlehttp/psr7": "^1.4"
+    "guzzlehttp/psr7": "^1.4",
+    "myclabs/php-enum": "^1.5"
   },
   "autoload": {
     "psr-4": {

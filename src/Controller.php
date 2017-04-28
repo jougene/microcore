@@ -9,16 +9,21 @@
 namespace MicroCore;
 
 
+use MicroCore\Interfaces\ControllerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Controller implements ControllerInterface
 {
 
-    public function run(ServerRequestInterface $request, ResponseInterface $response)
+    public function run(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $response = $response->withStatus(200);
-        $response->getBody()->write('Test');
+        $response->getBody()->write($request->getUri()->getPath());
         return $response;
+    }
+
+    public function setAction(string $action)
+    {
+        // TODO: Implement setAction() method.
     }
 }

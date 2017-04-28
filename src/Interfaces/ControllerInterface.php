@@ -6,7 +6,7 @@
  * Time: 10:58
  */
 
-namespace MicroCore;
+namespace MicroCore\Interfaces;
 
 
 use Psr\Http\Message\ResponseInterface;
@@ -15,4 +15,6 @@ use Psr\Http\Message\ServerRequestInterface;
 interface ControllerInterface
 {
     public function run(ServerRequestInterface $request, ResponseInterface $response);
+
+    public function setAction(string $action);
 }
