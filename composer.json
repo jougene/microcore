@@ -13,7 +13,7 @@
     "neomerx/json-api": "v1.0.1",
     "alexlcdee/colorcli": "dev-master",
     "monolog/monolog": "2.0.x-dev",
-    "php-di/php-di": "6.0.x-dev",
+    "php-di/php-di": "~5",
     "aura/router": "^3.1",
     "guzzlehttp/psr7": "^1.4"
   },
