@@ -32,5 +32,5 @@ $builder->addDefinitions([
     })()
 ]);
 
-$app = new App($builder->build());
+$app = new App();
 $app->run();

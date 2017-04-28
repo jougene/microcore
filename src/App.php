@@ -10,6 +10,7 @@ namespace MicroCore;
 
 
 use Aura\Router\RouterContainer;
+use DI\ContainerBuilder;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Uri;
@@ -18,11 +19,16 @@ use Psr\Log\LoggerInterface;
 
 class App
 {
+    /**
+     * @var ContainerInterface
+     */
     protected $container;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(array $config = [])
     {
-        $this->container = $container;
+        $builder = new ContainerBuilder();
+        $builder->addDefinitions($this->buildConfig($config));
+        $this->container = $builder->build();
         $this->getLogger()->info('Starting app');
     }
 
@@ -48,6 +54,12 @@ class App
      */
     public function getLogger()
     {
-        return $this->container->get('Logger');
+        return $this->container->get('components')->get('Logger');
+    }
+
+    protected function buildConfig(array $config = [])
+    {
+
+        return $config;
     }
 }
