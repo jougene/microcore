@@ -13,5 +13,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface RouterInterface
 {
-    public function match(ServerRequestInterface $request): ?RouteInterface;
+    /**
+     * @param ServerRequestInterface $request
+     * @return RouteInterface|null
+     */
+    public function match(ServerRequestInterface $request);
 }

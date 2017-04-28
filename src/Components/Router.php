@@ -50,6 +50,7 @@ class Router implements RouterInterface
             }
             $this->routes[] = (new Route($this->app))->setPath($path)->setHandler($definition)->setVerb($verb);
         } else {
+            // path prefix definition
             $basePath = $path;
             $routes = $definition;
             foreach ($routes as $path => $definition) {
@@ -58,10 +59,10 @@ class Router implements RouterInterface
         }
     }
 
-    public function match(ServerRequestInterface $request): ?RouteInterface
+    public function match(ServerRequestInterface $request)
     {
         foreach ($this->routes as $route) {
-            if ($route->match($request))
+            if (($route = $route->match($request)) !== false)
                 return $route;
         }
         return null;

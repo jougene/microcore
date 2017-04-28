@@ -14,7 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface ControllerInterface
 {
-    public function run(ServerRequestInterface $request, ResponseInterface $response);
+    public function __construct($action, array $params = []);
 
-    public function setAction(string $action);
+    public function run(ServerRequestInterface $request, ResponseInterface $response);
 }

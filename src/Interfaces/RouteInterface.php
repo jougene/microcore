@@ -27,5 +27,9 @@ interface RouteInterface
 
     public function setHandler($handler): RouteInterface;
 
-    public function match(ServerRequestInterface $request): bool;
+    public function withParam(string $name, $value): RouteInterface;
+
+    public function match(ServerRequestInterface $request);
+
+    public function getParams(): array;
 }

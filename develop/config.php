@@ -34,7 +34,7 @@ return [
     'endpoints' => [
         '/api/v1' => [
             '/test' => \MicroCore\Controller::class,
-            '/test/{id}' => [\MicroCore\Controller::class, 'view']
+            '/test/{id:\d+}' => [\MicroCore\Controller::class, 'view']
         ],
         '/test' => [\MicroCore\Controller::class, 'test']
     ]

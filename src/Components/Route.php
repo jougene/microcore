@@ -9,6 +9,7 @@
 namespace MicroCore\Components;
 
 
+use GuzzleHttp\Psr7\ServerRequest;
 use MicroCore\Enums\Verb;
 use MicroCore\Interfaces\ControllerInterface;
 use MicroCore\Interfaces\RouteInterface;
@@ -37,13 +38,30 @@ class Route implements RouteInterface
     protected $controller = null;
 
     /**
+     * @var callable[]
+     */
+    protected $rules = [];
+
+    /**
      * @var App
      */
     protected $app;
 
+    /**
+     * @var array
+     */
+    protected $params = [];
+
     public function __construct(App $app)
     {
         $this->app = $app;
+        $this->rules[] = function (ServerRequest $request) {
+            if($this->getVerb()->equals(new Verb($request->getMethod()))) {
+                return $this;
+            }
+            return false;
+        };
+        $this->rules[] = new PathMatcher($this);
     }
 
     public function getPath(): string
@@ -61,11 +79,11 @@ class Route implements RouteInterface
     {
         if ($this->controller === null) {
             if (!is_array($this->handler)) {
-                $this->controller = new $this->handler;
-                $this->controller->setAction($this->app->getContainer()->get('defaultControllerAction'));
+                $className = $this->handler;
+                $this->controller = new $className($this->app->getContainer()->get('defaultControllerAction'), $this->params);
             } else {
-                $this->controller = new $this->handler[0];
-                $this->controller->setAction($this->handler[1]);
+                $className = $this->handler[0];
+                $this->controller = new $className($this->handler[1], $this->params);
             }
         }
         return $this->controller;
@@ -77,13 +95,15 @@ class Route implements RouteInterface
         return $this;
     }
 
-    public function match(ServerRequestInterface $request): bool
+    public function match(ServerRequestInterface $request)
     {
-        // TODO: Implement match() method.
-        if (!$this->getVerb()->equals(new Verb($request->getMethod()))) {
-            return false;
+        $route = clone $this;
+        foreach ($this->rules as $rule) {
+            if(($route = $rule($request)) === false) {
+                return false;
+            }
         }
-        return true;
+        return $route;
     }
 
     public function getVerb(): Verb
@@ -98,5 +118,17 @@ class Route implements RouteInterface
     {
         $this->verb = $verb;
         return $this;
+    }
+
+    public function withParam(string $name, $value): RouteInterface
+    {
+        $object = clone $this;
+        $object->params[$name] = $value;
+        return $object;
+    }
+
+    public function getParams(): array
+    {
+        return $this->params;
     }
 }

@@ -15,15 +15,20 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class Controller implements ControllerInterface
 {
+    protected $params = [];
+
+    protected $action = '';
+
+    public function __construct($action, array $params = [])
+    {
+        $this->action = $action;
+        $this->params = $params;
+    }
 
     public function run(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $response->getBody()->write($request->getUri()->getPath());
+        var_dump($this->params);
         return $response;
-    }
-
-    public function setAction(string $action)
-    {
-        // TODO: Implement setAction() method.
     }
 }
