@@ -16,46 +16,39 @@ use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 abstract class AbstractController implements ControllerInterface
 {
-    protected $params = [];
-
-    private $action = '';
-
     protected $app;
-
     /**
      * @var RequestInterface
      */
     protected $request;
-
     /**
      * @var ResponseInterface
      */
     protected $response;
+    private $action = '';
 
     /**
      * ControllerInterface constructor.
      * @param ServiceInterface $app
      * @param string $action
-     * @param array $params
      */
-    public function __construct(ServiceInterface $app, $action, array $params = [])
+    public function __construct(ServiceInterface $app, $action)
     {
         $this->action = $action;
-        $this->params = $params;
     }
 
     /**
      * @param RequestInterface $request
      * @param ResponseInterface $response
-     * @return mixed
+     * @return ResponseInterface
      */
-    public function run(RequestInterface $request, ResponseInterface $response): ResponseInterface
+    public function __invoke(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $this->request = $request;
         $this->response = $response;
         $method = new \ReflectionMethod($this, $this->action);
         $ps = [];
-        $params = $this->params;
+        $params = $request->getAttribute('_params', []);
         foreach ($method->getParameters() as $i => $param) {
             $name = $param->getName();
             if (isset($params[$name])) {

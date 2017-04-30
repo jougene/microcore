@@ -2,7 +2,9 @@
 
 namespace Application\Controllers;
 
+use Application\Schemas\TestSchema;
 use MicroCore\Components\AbstractController;
+use Neomerx\JsonApi\Encoder\Encoder;
 
 /**
  * Created by PhpStorm.
@@ -19,6 +21,9 @@ class Test extends AbstractController
 
     public function item($apiVersion, $id)
     {
-        return json_encode(['version' => $apiVersion, 'id' => $id]);
+        $encoder = Encoder::instance([
+            \Application\Models\Test::class => TestSchema::class
+        ]);
+        return $encoder->encodeData(new \Application\Models\Test($id));
     }
 }

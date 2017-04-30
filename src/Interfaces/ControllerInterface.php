@@ -18,16 +18,15 @@ interface ControllerInterface
      * ControllerInterface constructor.
      * @param ServiceInterface $app
      * @param string $action
-     * @param array $params
      */
-    public function __construct(ServiceInterface $app, $action, array $params = []);
+    public function __construct(ServiceInterface $app, $action);
 
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return mixed
      */
-    public function run(ServerRequestInterface $request, ResponseInterface $response);
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response);
 
     /**
      * @return mixed

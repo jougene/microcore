@@ -9,7 +9,7 @@
 namespace MicroCore\Components\Routing;
 
 
-use Psr\Http\Message\ServerRequestInterface as RequestInterface;
+use MicroCore\Interfaces\RequestInterface;
 
 class PathMatcher
 {

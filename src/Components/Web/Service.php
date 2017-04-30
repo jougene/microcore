@@ -9,11 +9,10 @@
 namespace MicroCore\Components\Web;
 
 
-use GuzzleHttp\Psr7\Response;
+use MicroCore\Interfaces\RouterInterface;
 use MicroCore\Interfaces\ServiceInterface;
-use MicroCore\Interfaces\RouteInterface;
 use Psr\Container\ContainerInterface;
-use Psr\Http\Message\ResponseInterface;
+use Microcore\Interfaces\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 use Psr\Log\LoggerInterface;
 
@@ -32,18 +31,30 @@ class Service implements ServiceInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->requestHandler = function (RequestInterface $request, ResponseInterface $response) {
+            return call_user_func_array($request->getAttribute('_handler'), [$request, $response]);
+        };
     }
 
     public function run()
     {
         $request = new Request($this);
-        $route = $request->getRoute();
-        if ($route !== null) {
-            $response = $this->processRoute($request, $route);
-        } else {
-            $response = new Response(404, [], 'Endpoint not found');
+        $router = $this->getContainer()->get(RouterInterface::class);
+        $request = $router->match($request);
+        if ($request->getAttribute('_handler') === null) {
+            $response = (new response($this))->withStatus(404);
+            $response->getBody()->write('Endpoint not found');
+            return $response->end();
         }
-        $this->write($response);
+
+        $handler = $this->requestHandler;
+        $response = $handler($request, new response($this));
+        return $response->end();
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
     public function onRequest(callable $callback)
@@ -53,32 +64,11 @@ class Service implements ServiceInterface
         return $app;
     }
 
-    public function processRoute(RequestInterface $request, RouteInterface $route)
-    {
-        /** @var Response $response */
-        $response = call_user_func_array([$route->getHandler(), 'run'], [$request, new Response()]);
-        return $response;
-    }
-
-    public function write(ResponseInterface $response)
-    {
-        header("HTTP/{$response->getProtocolVersion()} {$response->getStatusCode()} {$response->getReasonPhrase()}");
-        foreach ($response->getHeaders() as $header) {
-            header($header);
-        }
-        echo $response->getBody();
-    }
-
     /**
      * @return LoggerInterface
      */
     public function getLogger(): LoggerInterface
     {
         return $this->container->get(LoggerInterface::class);
-    }
-
-    public function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 }

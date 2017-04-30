@@ -15,7 +15,7 @@ interface RouterInterface
 {
     /**
      * @param RequestInterface $request
-     * @return RouteInterface|null
+     * @return RequestInterface|null
      */
     public function match(RequestInterface $request);
 }

@@ -39,5 +39,16 @@ return [
             '/test' => [\Application\Controllers\Test::class, 'verbs' => [Verb::GET(), Verb::POST()]],
             '/test/{id:\d+}' => [\Application\Controllers\Test::class, 'item', 'verbs' => [Verb::GET(), Verb::PUT(), Verb::DELETE()]]
         ],
+        '/test' => function ($request, $response) {
+            $response->getBody()->write('test');
+            return $response;
+        },
+        '/test2' => [
+            function ($request, $response) {
+                $response->getBody()->write('test');
+                return $response;
+            },
+            'verbs' => [Verb::GET()]
+        ]
     ],
 ];

@@ -10,6 +10,8 @@ namespace MicroCore\Components\Routing;
 
 
 use MicroCore\Enums\Verb;
+use MicroCore\Interfaces\RequestInterface;
+use MicroCore\Interfaces\ResponseInterface;
 use MicroCore\Interfaces\ServiceInterface;
 use MicroCore\Interfaces\ControllerInterface;
 use MicroCore\Interfaces\RouteInterface;
@@ -81,20 +83,12 @@ class Route implements RouteInterface
     }
 
     /**
-     * @return ControllerInterface
+     * @return callable
      */
-    public function getHandler(): ControllerInterface
+    public function getHandler(): callable
     {
         if ($this->controller === null) {
-            $action = $this->app->getContainer()->get('defaultControllerAction');
-            if (!is_array($this->handler)) {
-                $className = $this->handler;
-            } else {
-                $className = $this->handler[0];
-                if(isset($this->handler[1]))
-                    $action = $this->handler[1];
-            }
-            $this->controller = new $className($this->app, $action, $this->params);
+            $this->controller = $this->resolveController();
         }
         return $this->controller;
     }
@@ -110,45 +104,31 @@ class Route implements RouteInterface
         return $object;
     }
 
-    /**
-     * @return callable[]
-     */
-    public function getRules()
+    private function resolveController()
     {
-        if (!count($this->rules)) {
-            $this->setDefaultRules();
+        if (is_array($this->handler)) {
+            if (isset($this->handler[0])) {
+                if ($this->handler[0] instanceof \Closure) {
+                    return $this->handler[0];
+                } elseif (is_string($this->handler[0]) && is_subclass_of($this->handler[0], ControllerInterface::class)) {
+                    /** @var ControllerInterface $controllerName */
+                    $controllerName = $this->handler[0];
+                    $action = isset($this->handler[1]) ? $this->handler[1] : $this->app->getContainer()->get('defaultControllerAction');
+                    return new $controllerName($this->app, $action);
+                }
+            }
+        } elseif ($this->handler instanceof \Closure) {
+            return $this->handler;
+        } elseif (is_string($this->handler) && is_subclass_of($this->handler, ControllerInterface::class)) {
+            /** @var ControllerInterface $controllerName */
+            $controllerName = $this->handler;
+            $action = $this->app->getContainer()->get('defaultControllerAction');
+            return new $controllerName($this->app, $action);
         }
-        return $this->rules;
-    }
-
-    protected function setDefaultRules()
-    {
-        $this->rules[] = function (ServerRequestInterface $request) {
-            return Verb::OPTIONS()->equals(new Verb($request->getMethod())) || in_array($request->getMethod(), $this->verbs);
+        return function (RequestInterface $request, ResponseInterface $response) {
+            $response = $response->withStatus(404);
+            $response->getBody()->write('Request handler not found');
         };
-        $this->rules[] = new PathMatcher($this);
-    }
-
-    /**
-     * @param callable $rule
-     */
-    public function addRule(callable $rule)
-    {
-        $this->rules[] = $rule;
-    }
-
-    /**
-     * @param callable[] $rules
-     * @param bool $setDefaults
-     */
-    public function setRules(array $rules, $setDefaults = true)
-    {
-        if($setDefaults && !count($this->rules)) {
-            $this->setDefaultRules();
-        }
-        foreach ($rules as $rule) {
-            $this->addRule($rule);
-        }
     }
 
     /**
@@ -164,6 +144,47 @@ class Route implements RouteInterface
             }
         }
         return $route;
+    }
+
+    /**
+     * @return callable[]
+     */
+    public function getRules()
+    {
+        if (!count($this->rules)) {
+            $this->setDefaultRules();
+        }
+        return $this->rules;
+    }
+
+    /**
+     * @param callable[] $rules
+     * @param bool $setDefaults
+     */
+    public function setRules(array $rules, $setDefaults = true)
+    {
+        if ($setDefaults && !count($this->rules)) {
+            $this->setDefaultRules();
+        }
+        foreach ($rules as $rule) {
+            $this->addRule($rule);
+        }
+    }
+
+    protected function setDefaultRules()
+    {
+        $this->rules[] = function (RequestInterface $request) {
+            return Verb::OPTIONS()->equals(new Verb($request->getMethod())) || in_array($request->getMethod(), $this->verbs);
+        };
+        $this->rules[] = new PathMatcher($this);
+    }
+
+    /**
+     * @param callable $rule
+     */
+    public function addRule(callable $rule)
+    {
+        $this->rules[] = $rule;
     }
 
     /**

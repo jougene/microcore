@@ -38,9 +38,9 @@ interface RouteInterface
     public function getPath(): string;
 
     /**
-     * @return ControllerInterface
+     * @return callable
      */
-    public function getHandler(): ControllerInterface;
+    public function getHandler(): callable;
 
     /**
      * @param $handler

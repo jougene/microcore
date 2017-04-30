@@ -12,9 +12,8 @@ namespace MicroCore\Components\Web;
 use GuzzleHttp\Psr7\MessageTrait;
 use GuzzleHttp\Psr7\ServerRequest;
 use MicroCore\Interfaces\RouteInterface;
-use MicroCore\Interfaces\RouterInterface;
 use MicroCore\Interfaces\ServiceInterface;
-use Psr\Http\Message\ServerRequestInterface as RequestInterface;
+use MicroCore\Interfaces\RequestInterface;
 use Psr\Http\Message\UriInterface;
 
 class Request implements RequestInterface
@@ -39,16 +38,6 @@ class Request implements RequestInterface
     {
         $this->app = $app;
         $this->request = ServerRequest::fromGlobals();
-    }
-
-    public function getRoute()
-    {
-        if($this->route === null) {
-            /** @var RouterInterface $router */
-            $router = $this->app->getContainer()->get(RouterInterface::class);
-            $this->route = $router->match($this);
-        }
-        return $this->route;
     }
 
     /**
