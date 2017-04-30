@@ -10,6 +10,7 @@ namespace MicroCore\Components\Routing;
 
 
 use MicroCore\Enums\Verb;
+use MicroCore\Exceptions\InvalidConfigException;
 use MicroCore\Interfaces\ServiceInterface;
 use MicroCore\Interfaces\RouteInterface;
 use MicroCore\Interfaces\RouterInterface;
@@ -30,10 +31,14 @@ class Router implements RouterInterface
     /**
      * Router constructor.
      * @param ServiceInterface $app
+     * @throws InvalidConfigException if there are no endpoints specified
      */
     public function __construct(ServiceInterface $app)
     {
         $this->app = $app;
+        if (!$app->getContainer()->has('endpoints')) {
+            throw new InvalidConfigException('Config property "endpoints" must be specified.');
+        }
         $endpoints = $app->getContainer()->get('endpoints');
         foreach ($endpoints as $path => $definition) {
             $this->route($path, $definition);
@@ -82,11 +87,12 @@ class Router implements RouterInterface
     {
         foreach ($this->routes as $route) {
             if (($route = $route->match($request)) !== false) {
-                $request = $request->withAttribute('_handler', $route->getHandler());
-                $request = $request->withAttribute('_params', $route->getParams());
+                $request = $request->withAttribute('_handler', $route->getHandler())
+                    ->withAttribute('_params', $route->getParams())
+                    ->withAttribute('_verbs', $route->getVerbs());
                 return $request;
             }
         }
-        return null;
+        return $request;
     }
 }

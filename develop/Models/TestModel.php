@@ -2,7 +2,7 @@
 
 namespace Application\Models;
 
-class Test
+class TestModel
 {
     public $id;
     public $text = 'test text';

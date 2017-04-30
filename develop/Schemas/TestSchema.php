@@ -36,4 +36,6 @@ class TestSchema extends \Neomerx\JsonApi\Schema\SchemaProvider
             'text' => $resource->text
         ];
     }
+
+
 }

@@ -2,11 +2,11 @@
 /**
  * Created by PhpStorm.
  * User: lcdee
- * Date: 27.04.2017
- * Time: 14:32
+ * Date: 30.04.2017
+ * Time: 17:45
  */
 
-namespace MicroCore\Components\Web;
+namespace MicroCore\Components\Console;
 
 
 use ColorCLI\Logger;
@@ -18,40 +18,20 @@ use MicroCore\Components\Routing\Router;
 use MicroCore\Interfaces\RouteInterface;
 use MicroCore\Interfaces\RouterInterface;
 use MicroCore\Interfaces\ServiceInterface;
-use Microcore\Interfaces\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use function DI\object;
 use function DI\get;
 
 class Service extends AbstractService implements ServiceInterface
 {
-    /**
-     * @var callable
-     */
-    protected $requestHandler;
 
+    /**
+     * Run the application
+     * @return void
+     */
     public function run()
     {
-        $request = new Request($this);
-        $router = $this->getContainer()->get(RouterInterface::class);
-        $request = $router->match($request);
-        if ($request->getAttribute('_handler') === null) {
-            $response = (new Response($this))->withStatus(404);
-            $response->getBody()->write('Endpoint not found');
-            return $response->end();
-        }
-
-        $handler = $this->requestHandler;
-        /** @var ResponseInterface $response */
-        $response = $handler($request, new Response($this));
-        return $response->end();
-    }
-
-    public function onRequest(callable $callback)
-    {
-        $app = clone $this;
-        $app->requestHandler = $callback;
-        return $app;
+        // TODO: Implement run() method.
     }
 
     public function setupContainer($config)
