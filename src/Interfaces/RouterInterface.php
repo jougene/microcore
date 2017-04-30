@@ -9,13 +9,13 @@
 namespace MicroCore\Interfaces;
 
 
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 interface RouterInterface
 {
     /**
-     * @param ServerRequestInterface $request
+     * @param RequestInterface $request
      * @return RouteInterface|null
      */
-    public function match(ServerRequestInterface $request);
+    public function match(RequestInterface $request);
 }

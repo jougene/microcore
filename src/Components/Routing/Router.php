@@ -6,16 +6,20 @@
  * Time: 10:45
  */
 
-namespace MicroCore\Components;
+namespace MicroCore\Components\Routing;
 
 
 use MicroCore\Enums\Verb;
+use MicroCore\Interfaces\ServiceInterface;
 use MicroCore\Interfaces\RouteInterface;
 use MicroCore\Interfaces\RouterInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 class Router implements RouterInterface
 {
+    /**
+     * @var ServiceInterface
+     */
     protected $app;
 
     /**
@@ -25,9 +29,9 @@ class Router implements RouterInterface
 
     /**
      * Router constructor.
-     * @param App $app
+     * @param ServiceInterface $app
      */
-    public function __construct(App $app)
+    public function __construct(ServiceInterface $app)
     {
         $this->app = $app;
         $endpoints = $app->getContainer()->get('endpoints');
@@ -36,19 +40,30 @@ class Router implements RouterInterface
         }
     }
 
+    /**
+     * @param $path
+     * @param $definition
+     * @param null $basePath
+     */
     public function route($path, $definition, $basePath = null)
     {
         if (!is_array($definition) || isset($definition[0])) {
             // Route definition
-            $verb = Verb::GET();
-            if (isset($definition['verb'])) {
-                $verb = new Verb($definition['verb']);
-                unset($definition['verb']);
+            $verbs = [Verb::GET(), Verb::POST(), Verb::PUT(), Verb::DELETE()];
+            if (isset($definition['verbs'])) {
+                $verbs = $definition['verbs'];
+                unset($definition['verbs']);
             }
             if ($basePath !== null) {
                 $path = '/' . trim($basePath, '/') . '/' . trim($path, '/');
             }
-            $this->routes[] = (new Route($this->app))->setPath($path)->setHandler($definition)->setVerb($verb);
+            $object = $this->app->getContainer()->get(RouteInterface::class);
+            if(isset($definition['routeClass'])) {
+                $object = $this->app->getContainer()->get($definition['routeClass']);
+                unset($definition['routeClass']);
+            }
+            $route = $object->setPath($path)->setHandler($definition)->setVerbs($verbs);
+            $this->routes[] = $route;
         } else {
             // path prefix definition
             $basePath = $path;
@@ -59,7 +74,11 @@ class Router implements RouterInterface
         }
     }
 
-    public function match(ServerRequestInterface $request)
+    /**
+     * @param RequestInterface $request
+     * @return RouteInterface|null
+     */
+    public function match(RequestInterface $request)
     {
         foreach ($this->routes as $route) {
             if (($route = $route->match($request)) !== false)

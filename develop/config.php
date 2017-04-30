@@ -7,10 +7,14 @@
  */
 
 use ColorCLI\Logger;
-use MicroCore\Components\App;
+use MicroCore\Components\Web\Service;
 use MicroCore\Components\Logging;
+use MicroCore\Components\Routing\Route;
+use MicroCore\Enums\Verb;
+use MicroCore\Interfaces\ServiceInterface;
+use MicroCore\Interfaces\RouteInterface;
 use MicroCore\Interfaces\RouterInterface;
-use MicroCore\Components\Router;
+use MicroCore\Components\Routing\Router;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger as MonoLogger;
 use Psr\Log\LoggerInterface;
@@ -18,10 +22,8 @@ use function DI\object;
 use function DI\get;
 
 return [
-    'app.host' => '127.0.0.1',
-    'app.port' => '8080',
     'defaultControllerAction' => 'index',
-    App::class => object(),
+    ServiceInterface::class => object(Service::class),
     LoggerInterface::class => object(Logging::class)->constructor(get('log.loggers')),
     'log.loggers' => [
         get(Logger::class),
@@ -31,11 +33,11 @@ return [
         object(RotatingFileHandler::class)->constructor(__DIR__ . '/logs/app.log'),
     ],
     RouterInterface::class => object(Router::class),
+    RouteInterface::class => object(Route::class),
     'endpoints' => [
-        '/api/v1' => [
-            '/test' => \MicroCore\Controller::class,
-            '/test/{id:\d+}' => [\MicroCore\Controller::class, 'view']
+        '/api/v{apiVersion:\d+}' => [
+            '/test' => [\Application\Controllers\Test::class, 'verbs' => [Verb::GET(), Verb::POST()]],
+            '/test/{id:\d+}' => [\Application\Controllers\Test::class, 'item', 'verbs' => [Verb::GET(), Verb::PUT(), Verb::DELETE()]]
         ],
-        '/test' => [\MicroCore\Controller::class, 'test']
-    ]
+    ],
 ];

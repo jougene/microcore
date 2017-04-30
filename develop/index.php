@@ -1,16 +1,12 @@
 <?php
 
 use DI\ContainerBuilder;
-use MicroCore\Components\App;
+use MicroCore\Interfaces\ServiceInterface;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
-
-echo '<pre>';
 
 (new ContainerBuilder())
     ->addDefinitions('config.php')
     ->build()
-    ->get(App::class)
+    ->get(ServiceInterface::class)
     ->run();
-
-echo '</pre>';

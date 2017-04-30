@@ -10,26 +10,59 @@ namespace MicroCore\Interfaces;
 
 
 use MicroCore\Enums\Verb;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 interface RouteInterface
 {
 
-    public function setVerb(Verb $verb): RouteInterface;
+    /**
+     * @param Verb[] $verbs
+     * @return RouteInterface
+     */
+    public function setVerbs(array $verbs): RouteInterface;
 
-    public function getVerb(): Verb;
+    /**
+     * @return Verb[]
+     */
+    public function getVerbs(): array;
 
+    /**
+     * @param string $path
+     * @return RouteInterface
+     */
     public function setPath(string $path): RouteInterface;
 
+    /**
+     * @return string
+     */
     public function getPath(): string;
 
+    /**
+     * @return ControllerInterface
+     */
     public function getHandler(): ControllerInterface;
 
+    /**
+     * @param $handler
+     * @return RouteInterface
+     */
     public function setHandler($handler): RouteInterface;
 
+    /**
+     * @param string $name
+     * @param $value
+     * @return RouteInterface
+     */
     public function withParam(string $name, $value): RouteInterface;
 
-    public function match(ServerRequestInterface $request);
+    /**
+     * @param RequestInterface $request
+     * @return bool|RouteInterface
+     */
+    public function match(RequestInterface $request);
 
+    /**
+     * @return array
+     */
     public function getParams(): array;
 }

@@ -6,10 +6,10 @@
  * Time: 22:32
  */
 
-namespace MicroCore\Components;
+namespace MicroCore\Components\Routing;
 
 
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 class PathMatcher
 {
@@ -27,13 +27,13 @@ class PathMatcher
         $this->route = $route;
     }
 
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(RequestInterface $request)
     {
         $regex = $this->buildRegex();
         if(preg_match($regex, $request->getUri()->getPath(), $matches)) {
             $route = clone $this->route;
             foreach ($this->params as $param) {
-                $route = $this->route->withParam($param, $matches[$param]);
+                $route = $route->withParam($param, $matches[$param]);
             }
             return $route;
         }
