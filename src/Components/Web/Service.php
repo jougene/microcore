@@ -11,6 +11,7 @@ namespace MicroCore\Components\Web;
 
 use ColorCLI\Logger;
 use DI\ContainerBuilder;
+use DI\Scope;
 use MicroCore\Components\AbstractService;
 use MicroCore\Components\Logging;
 use MicroCore\Components\Routing\Route;
@@ -42,6 +43,7 @@ class Service extends AbstractService implements ServiceInterface
 
     public function run()
     {
+        $this->getLogger()->debug('Request begin');
         $request = $this->container->make(RequestInterface::class);
         $router = $this->getContainer()->get(RouterInterface::class);
         $request = $router->match($request);
@@ -54,6 +56,7 @@ class Service extends AbstractService implements ServiceInterface
         $handler = $this->requestHandler;
         /** @var ResponseInterface $response */
         $response = $handler($request, $this->container->make(ResponseInterface::class));
+        $this->getLogger()->debug('Request end');
         return $response->end();
     }
 
@@ -75,9 +78,9 @@ class Service extends AbstractService implements ServiceInterface
                 get(Logger::class),
             ],
             RouterInterface::class => object(Router::class),
-            RouteInterface::class => object(Route::class),
-            RequestInterface::class => object(Request::class),
-            ResponseInterface::class => object(Response::class),
+            RouteInterface::class => object(Route::class)->scope(Scope::PROTOTYPE),
+            RequestInterface::class => object(Request::class)->scope(Scope::PROTOTYPE),
+            ResponseInterface::class => object(Response::class)->scope(Scope::PROTOTYPE),
         ]);
         $builder->addDefinitions($config);
         $this->container = $builder->build();
