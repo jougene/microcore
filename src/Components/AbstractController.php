@@ -34,6 +34,7 @@ abstract class AbstractController implements ControllerInterface
      */
     public function __construct(ServiceInterface $app, $action)
     {
+        $this->app = $app;
         $this->action = $action;
     }
 
@@ -65,6 +66,7 @@ abstract class AbstractController implements ControllerInterface
                 return $this->returnFalse($response);
             }
         }
+        $this->app->getLogger()->debug('Run controller {name}', ['name' => get_class($this)]);
         $responseData = $method->invokeArgs($this, $ps);
         $this->response->getBody()->write($responseData);
         return $this->response;

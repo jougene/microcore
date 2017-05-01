@@ -54,7 +54,7 @@ class Router implements RouterInterface
     {
         if (!is_array($definition) || isset($definition[0])) {
             // Route definition
-            $verbs = [Verb::GET(), Verb::POST(), Verb::PUT(), Verb::DELETE()];
+            $verbs = [Verb::GET(), Verb::POST()];
             if (is_array($definition) && isset($definition['verbs'])) {
                 $verbs = $definition['verbs'];
                 unset($definition['verbs']);
@@ -62,7 +62,7 @@ class Router implements RouterInterface
             if ($basePath !== null) {
                 $path = '/' . trim($basePath, '/') . '/' . trim($path, '/');
             }
-            $object = $this->app->getContainer()->get(RouteInterface::class);
+            $object = clone $this->app->getContainer()->get(RouteInterface::class);
             if (is_array($definition) && isset($definition['routeClass'])) {
                 $object = $this->app->getContainer()->get($definition['routeClass']);
                 unset($definition['routeClass']);
@@ -86,10 +86,15 @@ class Router implements RouterInterface
     public function match(RequestInterface $request)
     {
         foreach ($this->routes as $route) {
+            $this->app->getLogger()->debug("Check route '{route}' against path '{path}'", [
+                'route' => $route->getPath(),
+                'path' => $request->getUri()->getPath()
+            ]);
             if (($route = $route->match($request)) !== false) {
                 $request = $request->withAttribute('_handler', $route->getHandler())
-                    ->withAttribute('_params', $route->getParams())
-                    ->withAttribute('_verbs', $route->getVerbs());
+                    ->withAttribute('_params', $route->getParams());
+                $request = $request->withAttribute('_verbs', $route->getVerbs());
+                $this->app->getLogger()->debug("Matched route: '{path}'", ['path' => $route->getPath()]);
                 return $request;
             }
         }

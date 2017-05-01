@@ -15,6 +15,7 @@ use MicroCore\Components\AbstractService;
 use MicroCore\Components\Logging;
 use MicroCore\Components\Routing\Route;
 use MicroCore\Components\Routing\Router;
+use MicroCore\Interfaces\RequestInterface;
 use MicroCore\Interfaces\RouteInterface;
 use MicroCore\Interfaces\RouterInterface;
 use MicroCore\Interfaces\ServiceInterface;
@@ -23,6 +24,10 @@ use Psr\Log\LoggerInterface;
 use function DI\object;
 use function DI\get;
 
+/**
+ * Class Service
+ * @package MicroCore\Components\Web
+ */
 class Service extends AbstractService implements ServiceInterface
 {
     /**
@@ -30,9 +35,14 @@ class Service extends AbstractService implements ServiceInterface
      */
     protected $requestHandler;
 
+    /**
+     * @var \DI\Container
+     */
+    protected $container;
+
     public function run()
     {
-        $request = new Request($this);
+        $request = $this->container->make(RequestInterface::class);
         $router = $this->getContainer()->get(RouterInterface::class);
         $request = $router->match($request);
         if ($request->getAttribute('_handler') === null) {
@@ -43,7 +53,7 @@ class Service extends AbstractService implements ServiceInterface
 
         $handler = $this->requestHandler;
         /** @var ResponseInterface $response */
-        $response = $handler($request, new Response($this));
+        $response = $handler($request, $this->container->make(ResponseInterface::class));
         return $response->end();
     }
 
@@ -66,6 +76,8 @@ class Service extends AbstractService implements ServiceInterface
             ],
             RouterInterface::class => object(Router::class),
             RouteInterface::class => object(Route::class),
+            RequestInterface::class => object(Request::class),
+            ResponseInterface::class => object(Response::class),
         ]);
         $builder->addDefinitions($config);
         $this->container = $builder->build();

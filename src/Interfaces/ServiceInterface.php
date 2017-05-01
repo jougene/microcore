@@ -23,11 +23,11 @@ interface ServiceInterface
     /**
      * @return ContainerInterface DI container instance
      */
-    public function getContainer(): ContainerInterface;
+    public function getContainer();
 
     /**
      * @return LoggerInterface Logger instance
      */
-    public function getLogger(): LoggerInterface;
+    public function getLogger();
 
 }

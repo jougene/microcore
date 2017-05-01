@@ -125,6 +125,7 @@ class Route implements RouteInterface
             $action = $this->app->getContainer()->get('defaultControllerAction');
             return new $controllerName($this->app, $action);
         }
+        $this->app->getLogger()->warning('Request handler not found');
         return function (RequestInterface $request, ResponseInterface $response) {
             $response = $response->withStatus(404);
             $response->getBody()->write('Request handler not found');
@@ -173,10 +174,12 @@ class Route implements RouteInterface
 
     protected function setDefaultRules()
     {
-        $this->rules[] = function (RequestInterface $request) {
-            return Verb::OPTIONS()->equals(new Verb($request->getMethod())) || in_array($request->getMethod(), $this->verbs);
-        };
-        $this->rules[] = new PathMatcher($this);
+        $this->setRules([
+            function (RequestInterface $request) {
+                return Verb::OPTIONS()->equals(new Verb($request->getMethod())) || in_array($request->getMethod(), $this->verbs);
+            },
+            new PathMatcher($this)
+        ], false);
     }
 
     /**

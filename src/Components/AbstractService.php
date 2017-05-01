@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractService implements ServiceInterface
 {
     /**
-     * @var ContainerInterface
+     * @var \DI\Container
      */
     protected $container;
 
@@ -36,7 +36,10 @@ abstract class AbstractService implements ServiceInterface
 
     protected abstract function setupContainer($config);
 
-    public function getContainer(): ContainerInterface
+    /**
+     * @return \DI\Container
+     */
+    public function getContainer()
     {
         return $this->container;
     }
