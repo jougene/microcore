@@ -18,13 +18,10 @@ class Response implements ResponseInterface
     use MessageTrait;
 
     /**
-     * @var ServiceInterface
-     */
-    protected $app;
-    /**
      * @var string
      */
     private $reasonPhrase = '';
+
     /**
      * @var int
      */
@@ -35,9 +32,8 @@ class Response implements ResponseInterface
      */
     private $response;
 
-    public function __construct(ServiceInterface $app)
+    public function __construct()
     {
-        $this->app = $app;
         $this->response = new \GuzzleHttp\Psr7\Response(200);
     }
 

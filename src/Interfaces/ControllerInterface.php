@@ -16,10 +16,9 @@ interface ControllerInterface
 {
     /**
      * ControllerInterface constructor.
-     * @param ServiceInterface $app
      * @param string $action
      */
-    public function __construct(ServiceInterface $app, $action);
+    public function __construct($action);
 
     /**
      * @param ServerRequestInterface $request

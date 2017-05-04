@@ -45,23 +45,9 @@ class Route implements RouteInterface
     protected $rules = [];
 
     /**
-     * @var ServiceInterface
-     */
-    protected $app;
-
-    /**
      * @var array
      */
     protected $params = [];
-
-    /**
-     * Route constructor.
-     * @param ServiceInterface $app
-     */
-    public function __construct(ServiceInterface $app)
-    {
-        $this->app = $app;
-    }
 
     /**
      * @return string
@@ -113,8 +99,8 @@ class Route implements RouteInterface
                 } elseif (is_string($this->handler[0]) && is_subclass_of($this->handler[0], ControllerInterface::class)) {
                     /** @var ControllerInterface $controllerName */
                     $controllerName = $this->handler[0];
-                    $action = isset($this->handler[1]) ? $this->handler[1] : $this->app->getContainer()->get('defaultControllerAction');
-                    return new $controllerName($this->app, $action);
+                    $action = isset($this->handler[1]) ? $this->handler[1] : 'index';
+                    return new $controllerName($action);
                 }
             }
         } elseif ($this->handler instanceof \Closure) {
@@ -122,10 +108,9 @@ class Route implements RouteInterface
         } elseif (is_string($this->handler) && is_subclass_of($this->handler, ControllerInterface::class)) {
             /** @var ControllerInterface $controllerName */
             $controllerName = $this->handler;
-            $action = $this->app->getContainer()->get('defaultControllerAction');
-            return new $controllerName($this->app, $action);
+            // TODO: pass default controller action
+            return new $controllerName('index');
         }
-        $this->app->getLogger()->warning('Request handler not found');
         return function (RequestInterface $request, ResponseInterface $response) {
             $response = $response->withStatus(404);
             $response->getBody()->write('Request handler not found');

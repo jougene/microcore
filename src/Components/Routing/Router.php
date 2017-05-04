@@ -18,10 +18,6 @@ use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 class Router implements RouterInterface
 {
-    /**
-     * @var ServiceInterface
-     */
-    protected $app;
 
     /**
      * @var Route[]
@@ -30,16 +26,11 @@ class Router implements RouterInterface
 
     /**
      * Router constructor.
-     * @param ServiceInterface $app
+     * @param array $endpoints
      * @throws InvalidConfigException if there are no endpoints specified
      */
-    public function __construct(ServiceInterface $app)
+    public function __construct($endpoints)
     {
-        $this->app = $app;
-        if (!$app->getContainer()->has('endpoints')) {
-            throw new InvalidConfigException('Config property "endpoints" must be specified.');
-        }
-        $endpoints = $app->getContainer()->get('endpoints');
         foreach ($endpoints as $path => $definition) {
             $this->route($path, $definition);
         }
@@ -62,9 +53,10 @@ class Router implements RouterInterface
             if ($basePath !== null) {
                 $path = '/' . trim($basePath, '/') . '/' . trim($path, '/');
             }
-            $object = clone $this->app->getContainer()->get(RouteInterface::class);
+            $object = new Route();
             if (is_array($definition) && isset($definition['routeClass'])) {
-                $object = $this->app->getContainer()->get($definition['routeClass']);
+                $object = $definition['routeClass'];
+                $object = new $object;
                 unset($definition['routeClass']);
             }
             $route = $object->setPath($path)->setHandler($definition)->setVerbs($verbs);
@@ -86,15 +78,11 @@ class Router implements RouterInterface
     public function match(RequestInterface $request)
     {
         foreach ($this->routes as $route) {
-            $this->app->getLogger()->debug("Check route '{route}' against path '{path}'", [
-                'route' => $route->getPath(),
-                'path' => $request->getUri()->getPath()
-            ]);
+
             if (($route = $route->match($request)) !== false) {
                 $request = $request->withAttribute('_handler', $route->getHandler())
-                    ->withAttribute('_params', $route->getParams());
-                $request = $request->withAttribute('_verbs', $route->getVerbs());
-                $this->app->getLogger()->debug("Matched route: '{path}'", ['path' => $route->getPath()]);
+                    ->withAttribute('_params', $route->getParams())
+                    ->withAttribute('_verbs', $route->getVerbs());
                 return $request;
             }
         }

@@ -19,10 +19,6 @@ use Psr\Http\Message\UriInterface;
 class Request implements RequestInterface
 {
     use MessageTrait;
-    /**
-     * @var ServiceInterface
-     */
-    protected $app;
 
     /**
      * @var ServerRequest
@@ -34,9 +30,8 @@ class Request implements RequestInterface
      */
     protected $route = null;
 
-    public function __construct(ServiceInterface $app)
+    public function __construct()
     {
-        $this->app = $app;
         $this->request = ServerRequest::fromGlobals();
     }
 

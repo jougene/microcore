@@ -16,7 +16,6 @@ use Psr\Http\Message\ServerRequestInterface as RequestInterface;
 
 abstract class AbstractController implements ControllerInterface
 {
-    protected $app;
     /**
      * @var RequestInterface
      */
@@ -29,12 +28,10 @@ abstract class AbstractController implements ControllerInterface
 
     /**
      * ControllerInterface constructor.
-     * @param ServiceInterface $app
      * @param string $action
      */
-    public function __construct(ServiceInterface $app, $action)
+    public function __construct($action)
     {
-        $this->app = $app;
         $this->action = $action;
     }
 
@@ -66,7 +63,6 @@ abstract class AbstractController implements ControllerInterface
                 return $this->returnFalse($response);
             }
         }
-        $this->app->getLogger()->debug('Run controller {name}', ['name' => get_class($this)]);
         $responseData = $method->invokeArgs($this, $ps);
         $this->response->getBody()->write($responseData);
         return $this->response;
