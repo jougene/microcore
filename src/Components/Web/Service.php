@@ -70,19 +70,21 @@ class Service extends AbstractService implements ServiceInterface
     public function setupContainer($config)
     {
         $builder = new ContainerBuilder();
-        $builder->addDefinitions([
-            'defaultControllerAction' => 'index',
-            ServiceInterface::class => $this,
+        $definitions = [
             LoggerInterface::class => object(Logging::class)->constructor(get('log.loggers')),
             'log.loggers' => [
                 get(Logger::class),
             ],
-            RouterInterface::class => object(Router::class),
+            'endpoints' => [],
+            RouterInterface::class => object(Router::class)->constructor(get('endpoints')),
             RouteInterface::class => object(Route::class)->scope(Scope::PROTOTYPE),
             RequestInterface::class => object(Request::class)->scope(Scope::PROTOTYPE),
             ResponseInterface::class => object(Response::class)->scope(Scope::PROTOTYPE),
-        ]);
-        $builder->addDefinitions($config);
+        ];
+        if (isset($config['container'])) {
+            $definitions = array_merge_recursive($definitions, $config['container']);
+        }
+        $builder->addDefinitions($definitions);
         $this->container = $builder->build();
     }
 }

@@ -47,7 +47,9 @@ class Service extends AbstractService implements ServiceInterface
             RouterInterface::class => object(Router::class),
             RouteInterface::class => object(Route::class),
         ]);
-        $builder->addDefinitions($config);
+        if (isset($config['container'])) {
+            $builder->addDefinitions($config);
+        }
         $this->container = $builder->build();
     }
 }
